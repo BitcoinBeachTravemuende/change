@@ -1,0 +1,12 @@
+{
+  "editor.formatOnSave": true,
+  "tailwindCSS.includeLanguages": {
+    "elm": "html"
+  },
+  "tailwindCSS.experimental.classRegex": [
+    // inspired by https://github.com/paolotiu/tailwind-intellisense-regex-list?tab=readme-ov-file#haml
+    "\\bclass\\s*\\\"([_a-zA-Z0-9\\s\\-\\:\\/]+)\\\""
+  ],
+  // disable warnings "Unknown at rule @tailwind"
+  "css.validate": false
+}
