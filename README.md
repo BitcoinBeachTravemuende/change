@@ -2,13 +2,11 @@
 
 _...work in progress ..._
 
-> Built with [Elm Land](https://elm.land) 🌈
-
 ## Local development
 
-### Requirements:
+### Requirements
 
-#### Nix users: 
+#### Nix users
 ```bash
 cd {project-root}
 nix develop

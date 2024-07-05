@@ -1,7 +1,6 @@
 {
   "recommendations": [
     "elmtooling.elm-ls-vscode",
-    "elm-land.elm-land",
     "bbenoist.nix",
     "nefrob.vscode-just-syntax"
   ]

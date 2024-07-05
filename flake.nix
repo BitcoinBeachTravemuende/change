@@ -21,7 +21,7 @@
             elmPackages.elm-format
             elmPackages.elm-test
             elmPackages.elm-review
-            elmPackages.elm-land
+            elmPackages.elm-json
 
             nodejs_20
 

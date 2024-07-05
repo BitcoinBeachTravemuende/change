@@ -1,4 +1,4 @@
-module ExampleTests exposing (..)
+module ExampleTests exposing (hello, hello2, testEqual, testEqual2)
 
 import Expect
 import Test exposing (Test, test)
