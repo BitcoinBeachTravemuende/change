@@ -16,11 +16,15 @@ default:
 
 # build sources and run dev server
 dev:
-  elm-land server
+  npx vite
 
 # build sources for production
 build:
-  elm-land build
+  npx build
+
+# run server to preview sources for production 
+preview:
+  npx preview
 
 # run elm-format
 format:
