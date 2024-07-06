@@ -20,11 +20,11 @@ dev:
 
 # build sources for production
 build:
-  npx build
+  npx vite build
 
 # run server to preview sources for production 
 preview:
-  npx preview
+  npx vite preview
 
 # run elm-format
 format:

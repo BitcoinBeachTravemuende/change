@@ -8,5 +8,8 @@
     "\\bclass\\s*\\\"([_a-zA-Z0-9\\s\\-\\:\\/]+)\\\""
   ],
   // disable warnings "Unknown at rule @tailwind"
-  "css.validate": false
+  "css.validate": false,
+  // Using the workspace version of TypeScript
+  // https://code.visualstudio.com/docs/typescript/typescript-compiling#_using-the-workspace-version-of-typescript
+  "typescript.tsdk": "./node_modules/typescript/lib"
 }

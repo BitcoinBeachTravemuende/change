@@ -4,20 +4,17 @@ import Browser
 import Components.ThemeButton as ThemeButton
 import Html exposing (..)
 import Html.Attributes exposing (class)
-import Json.Decode
-import Shared.LocalStorage exposing (saveLocalStorage, themeKey)
-import Shared.Theme exposing (Theme(..), decodeTheme, encodeTheme, setDarkMode)
-
-
-type alias Flags =
-    Json.Decode.Value
+import InteropDefinitions exposing (..)
+import InteropPorts exposing (..)
+import Json.Decode exposing (..)
+import Shared.Theme exposing (Theme(..))
 
 
 
 -- MAIN
 
 
-main : Program Flags Model Msg
+main : Program Json.Decode.Value Model Msg
 main =
     Browser.element
         { init = init
@@ -36,14 +33,14 @@ type alias Model =
     }
 
 
-init : Flags -> ( Model, Cmd Msg )
+init : Json.Decode.Value -> ( Model, Cmd Msg )
 init flags =
     let
-        theme =
-            --  ignore errors and return `Light` instead
-            Result.withDefault Light (Json.Decode.decodeValue decodeTheme flags)
+        decoded =
+            InteropPorts.decodeFlags flags
+                |> Result.withDefault { theme = Light }
     in
-    ( { theme = theme
+    ( { theme = decoded.theme
       }
     , Cmd.none
     )
@@ -75,8 +72,8 @@ update msg model =
                     newTheme
               }
             , Cmd.batch
-                [ setDarkMode (newTheme == Dark)
-                , saveLocalStorage { key = themeKey, value = encodeTheme newTheme }
+                [ InteropPorts.fromElm (InteropDefinitions.SetDarkMode (newTheme == Dark))
+                , InteropPorts.fromElm (InteropDefinitions.SaveTheme newTheme)
                 ]
             )
 
@@ -106,7 +103,7 @@ view { theme } =
             ]
         , -- content
           h1
-            [ class "flex justify-center text-orange-400 text-4xl" ]
+            [ class "flex justify-center text-orange-400 text-4xl " ]
             [ text "Hello World"
             ]
         ]
