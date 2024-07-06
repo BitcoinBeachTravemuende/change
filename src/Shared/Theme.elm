@@ -1,7 +1,9 @@
-port module Shared.Theme exposing (Theme(..), decodeTheme, encodeTheme, fromString, setDarkMode, toString)
+module Shared.Theme exposing (Theme(..), decoder, encodeTheme, fromString, toString, tsDecoder, tsEncoder)
 
-import Json.Decode
-import Json.Encode
+import Json.Decode exposing (..)
+import Json.Encode exposing (..)
+import TsJson.Decode exposing (..)
+import TsJson.Encode exposing (..)
 
 
 type Theme
@@ -9,8 +11,8 @@ type Theme
     | Dark
 
 
-decodeTheme : Json.Decode.Decoder Theme
-decodeTheme =
+decoder : Json.Decode.Decoder Theme
+decoder =
     Json.Decode.string
         |> Json.Decode.andThen
             (\str ->
@@ -26,6 +28,14 @@ decodeTheme =
             )
 
 
+tsDecoder : TsJson.Decode.Decoder Theme
+tsDecoder =
+    TsJson.Decode.stringUnion
+        [ ( "light", Light )
+        , ( "dark", Dark )
+        ]
+
+
 encodeTheme : Theme -> Json.Encode.Value
 encodeTheme theme =
     case theme of
@@ -34,6 +44,22 @@ encodeTheme theme =
 
         Dark ->
             Json.Encode.string "dark"
+
+
+tsEncoder : TsJson.Encode.Encoder Theme
+tsEncoder =
+    TsJson.Encode.union
+        (\vLight vDark value ->
+            case value of
+                Light ->
+                    vLight
+
+                Dark ->
+                    vDark
+        )
+        |> variantLiteral (Json.Encode.string "light")
+        |> variantLiteral (Json.Encode.string "dark")
+        |> buildUnion
 
 
 toString : Theme -> String
@@ -57,8 +83,3 @@ fromString s =
 
         _ ->
             Light
-
-
-port setDarkMode :
-    Bool
-    -> Cmd msg
