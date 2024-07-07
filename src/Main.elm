@@ -32,9 +32,9 @@ main =
 type alias Model =
     { theme : Shared.Theme.Theme
     , editableBtcModel : EditableCurrency.Model
-    , btcValue : EditableCurrency.InputValue
+    , btcValue : EditableCurrency.InputValue -- TODO BigInt
     , editableFiatModel : EditableCurrency.Model
-    , fiatValue : EditableCurrency.InputValue
+    , fiatValue : EditableCurrency.InputValue -- TODO BigInt
     }
 
 
@@ -89,11 +89,12 @@ update msg m =
 
         EditableBtcMsg subMsg ->
             let
-                ( btcModel, _ ) =
+                ( btcModel, btcCmd ) =
                     EditableCurrency.update subMsg m.editableBtcModel
 
                 newModel =
                     case subMsg of
+                        -- save final value send from component
                         EditableCurrency.Save value ->
                             { m | btcValue = value }
 
@@ -101,16 +102,17 @@ update msg m =
                             m
             in
             ( { newModel | editableBtcModel = btcModel }
-            , Cmd.none
+            , Cmd.map EditableBtcMsg btcCmd
             )
 
         EditableFiatMsg subMsg ->
             let
-                ( fiatModel, _ ) =
+                ( fiatModel, fiatCmd ) =
                     EditableCurrency.update subMsg m.editableBtcModel
 
                 newModel =
                     case subMsg of
+                        -- save final value send from component
                         EditableCurrency.Save value ->
                             { m | fiatValue = value }
 
@@ -118,7 +120,7 @@ update msg m =
                             m
             in
             ( { newModel | editableFiatModel = fiatModel }
-            , Cmd.none
+            , Cmd.map EditableFiatMsg fiatCmd
             )
 
 
