@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Components.EditableCurrency as EditableCurrency
 import Components.ThemeButton as ThemeButton
 import Html exposing (..)
 import Html.Attributes exposing (class)
@@ -29,7 +30,11 @@ main =
 
 
 type alias Model =
-    { theme : Theme
+    { theme : Shared.Theme.Theme
+    , editableBtcModel : EditableCurrency.Model
+    , btcValue : EditableCurrency.InputValue -- TODO BigInt
+    , editableFiatModel : EditableCurrency.Model
+    , fiatValue : EditableCurrency.InputValue -- TODO BigInt
     }
 
 
@@ -41,6 +46,10 @@ init flags =
                 |> Result.withDefault { theme = Light }
     in
     ( { theme = decoded.theme
+      , editableBtcModel = EditableCurrency.initialModel
+      , editableFiatModel = EditableCurrency.initialModel
+      , btcValue = "21000"
+      , fiatValue = "42"
       }
     , Cmd.none
     )
@@ -52,22 +61,23 @@ init flags =
 
 type Msg
     = ToggleTheme
-    | NoOp
+    | EditableBtcMsg EditableCurrency.Msg
+    | EditableFiatMsg EditableCurrency.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update msg m =
     case msg of
         ToggleTheme ->
             let
                 newTheme =
-                    if model.theme == Light then
+                    if m.theme == Light then
                         Dark
 
                     else
                         Light
             in
-            ( { model
+            ( { m
                 | theme =
                     newTheme
               }
@@ -77,9 +87,40 @@ update msg model =
                 ]
             )
 
-        NoOp ->
-            ( model
-            , Cmd.none
+        EditableBtcMsg subMsg ->
+            let
+                ( btcModel, btcCmd ) =
+                    EditableCurrency.update subMsg m.editableBtcModel
+
+                newModel =
+                    case subMsg of
+                        -- save final value send from component
+                        EditableCurrency.Save value ->
+                            { m | btcValue = value }
+
+                        _ ->
+                            m
+            in
+            ( { newModel | editableBtcModel = btcModel }
+            , Cmd.map EditableBtcMsg btcCmd
+            )
+
+        EditableFiatMsg subMsg ->
+            let
+                ( fiatModel, fiatCmd ) =
+                    EditableCurrency.update subMsg m.editableBtcModel
+
+                newModel =
+                    case subMsg of
+                        -- save final value send from component
+                        EditableCurrency.Save value ->
+                            { m | fiatValue = value }
+
+                        _ ->
+                            m
+            in
+            ( { newModel | editableFiatModel = fiatModel }
+            , Cmd.map EditableFiatMsg fiatCmd
             )
 
 
@@ -93,17 +134,21 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view { theme } =
+view m =
     div
         [ class "container py-10 px-6" ]
         -- header
         [ div
             [ class "flex justify-end font-bold text-gray-600 dark:text-gray-200 text-8xl" ]
-            [ ThemeButton.view { theme = theme, onClick = ToggleTheme, class = "w-6 h-6" }
+            [ ThemeButton.view { theme = m.theme, onClick = ToggleTheme, class = "w-6 h-6" }
             ]
         , -- content
           h1
             [ class "flex justify-center text-orange-400 text-4xl " ]
             [ text "Hello World"
             ]
+        , Html.map EditableBtcMsg <| EditableCurrency.view m.btcValue m.editableBtcModel
+        , Html.map EditableFiatMsg <| EditableCurrency.view m.fiatValue m.editableFiatModel
+        , h2 [] [ text <| "btc " ++ m.btcValue ]
+        , h2 [] [ text <| "fiat " ++ m.fiatValue ]
         ]
